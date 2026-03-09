@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - رادار تليجرام الذكي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tahoma', 'Cairo', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.running {
+            background: #4caf50;
+        }
+        
+        .status-dot.stopped {
+            background: #f44336;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .toggle-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .toggle-btn.start {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .toggle-btn.stop {
+            background: #f44336;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #999;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        table th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: right;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .logs-container {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+        
+        .checkbox {
+            margin-right: 10px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 رادار تليجرام الذكي</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">تسجيل خروج</a>
+    </div>
+    
+    <div class="container">
+        <!-- Status Section -->
+        <div class="section">
+            <h2>حالة الرادار</h2>
+            <div class="status-indicator">
+                <div class="status-dot stopped" id="statusDot"></div>
+                <span id="statusText">متوقف</span>
+            </div>
+            <button class="toggle-btn stop" id="toggleBtn" onclick="toggleRadar()">تشغيل</button>
+        </div>
+        
+        <!-- Accounts Section -->
+        <div class="section">
+            <h2>إدارة الحسابات</h2>
+            <div id="accountsMessage"></div>
+            <table id="accountsTable">
+                <thead>
+                    <tr>
+                        <th>رقم الهاتف</th>
+                        <th>مجموعة الإشعارات</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="accountsList">
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">إضافة حساب جديد</h3>
+            <div class="form-group">
+                <label>رقم الهاتف (مع مفتاح الدولة)</label>
+                <input type="text" id="newPhone" placeholder="967XXXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label>API ID</label>
+                <input type="number" id="newApiId" placeholder="123456">
+            </div>
+            <div class="form-group">
+                <label>API Hash</label>
+                <input type="text" id="newApiHash" placeholder="abcdef123456...">
+            </div>
+            <div class="form-group">
+                <label>مجموعة الإشعارات (اختياري)</label>
+                <input type="text" id="newAlertGroup" placeholder="@group_name أو رابط المجموعة">
+            </div>
+            <button class="btn btn-primary" onclick="addAccount()">إضافة حساب</button>
+        </div>
+        
+        <!-- Keywords Section -->
+        <div class="section">
+            <h2>الكلمات المفتاحية</h2>
+            <div id="keywordsMessage"></div>
+            <div class="form-group">
+                <label>الكلمات المفتاحية (كلمة واحدة في كل سطر)</label>
+                <textarea id="keywordsText" placeholder="كلمة1&#10;كلمة2&#10;كلمة3"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveKeywords()">حفظ الكلمات</button>
+        </div>
+        
+        <!-- AI Settings Section -->
+        <div class="section">
+            <h2>إعدادات الذكاء الاصطناعي</h2>
+            <div id="settingsMessage"></div>
+            <div class="form-group">
+                <label>مفتاح OpenRouter API</label>
+                <input type="password" id="apiKey" placeholder="sk-...">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="aiEnabled" class="checkbox">
+                    تفعيل التصنيف الذكي
+                </label>
+            </div>
+            <div class="form-group">
+                <label>مجموعة الإشعارات الافتراضية</label>
+                <input type="text" id="defaultAlertGroup" placeholder="@group_name">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
+        </div>
+        
+        <!-- Logs Section -->
+        <div class="section">
+            <h2>سجل الأحداث</h2>
+            <button class="btn btn-secondary" onclick="refreshLogs()">تحديث</button>
+            <div class="logs-container" id="logsContainer">جاري تحميل السجلات...</div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh logs every 5 seconds
+        setInterval(refreshLogs, 5000);
+        
+        // Load initial data
+        loadAccounts();
+        loadKeywords();
+        loadSettings();
+        refreshLogs();
+        updateStatus();
+        
+        // Auto-refresh status every 2 seconds
+        setInterval(updateStatus, 2000);
+        
+        function updateStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    const dot = document.getElementById('statusDot');
+                    const text = document.getElementById('statusText');
+                    const btn = document.getElementById('toggleBtn');
+                    
+                    if (data.running) {
+                        dot.className = 'status-dot running';
+                        text.textContent = 'يعمل';
+                        btn.textContent = 'إيقاف';
+                        btn.className = 'toggle-btn stop';
+                    } else {
+                        dot.className = 'status-dot stopped';
+                        text.textContent = 'متوقف';
+                        btn.textContent = 'تشغيل';
+                        btn.className = 'toggle-btn start';
+                    }
+                });
+        }
+        
+        function toggleRadar() {
+            fetch('/api/toggle', { method: 'POST' })
+                .then(r => r.json())
+                .then(() => updateStatus());
+        }
+        
+        function loadAccounts() {
+            fetch('/api/accounts')
+                .then(r => r.json())
+                .then(accounts => {
+                    const tbody = document.getElementById('accountsList');
+                    tbody.innerHTML = '';
+                    accounts.forEach(acc => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${acc.phone}</td>
+                            <td>${acc.alert_group || 'افتراضية'}</td>
+                            <td><input type="checkbox" ${acc.enabled ? 'checked' : ''} onchange="toggleAccount('${acc.phone}', this.checked)"></td>
+                            <td><button class="btn btn-danger" onclick="deleteAccount('${acc.phone}')">حذف</button></td>
+                        `;
+                    });
+                });
+        }
+        
+        function addAccount() {
+            const phone = document.getElementById('newPhone').value;
+            const apiId = document.getElementById('newApiId').value;
+            const apiHash = document.getElementById('newApiHash').value;
+            const alertGroup = document.getElementById('newAlertGroup').value;
+            
+            if (!phone || !apiId || !apiHash) {
+                showMessage('accountsMessage', 'الرجاء ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+            
+            fetch('/api/accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, api_id: apiId, api_hash: apiHash, alert_group: alertGroup })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('accountsMessage', 'تم إضافة الحساب بنجاح', 'success');
+                    document.getElementById('newPhone').value = '';
+                    document.getElementById('newApiId').value = '';
+                    document.getElementById('newApiHash').value = '';
+                    document.getElementById('newAlertGroup').value = '';
+                    loadAccounts();
+                } else {
+                    showMessage('accountsMessage', data.error || 'حدث خطأ', 'error');
+                }
+            });
+        }
+        
+        function deleteAccount(phone) {
+            if (confirm('هل أنت متأكد من حذف هذا الحساب؟')) {
+                fetch(`/api/accounts/${phone}`, { method: 'DELETE' })
+                    .then(r => r.json())
+                    .then(() => loadAccounts());
+            }
+        }
+        
+        function toggleAccount(phone, enabled) {
+            fetch(`/api/accounts/${phone}/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled })
+            })
+            .then(r => r.json())
+            .then(() => loadAccounts());
+        }
+        
+        function loadKeywords() {
+            fetch('/api/keywords')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('keywordsText').value = data.keywords.join('\n');
+                });
+        }
+        
+        function saveKeywords() {
+            const keywords = document.getElementById('keywordsText').value;
+            fetch('/api/keywords/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keywords })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('keywordsMessage', `تم حفظ ${data.count} كلمة بنجاح`, 'success');
+                } else {
+                    showMessage('keywordsMessage', 'حدث خطأ', 'error');
+                }
+            });
+        }
+        
+        function loadSettings() {
+            fetch('/api/settings')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('aiEnabled').checked = data.ai_enabled === 'true';
+                    document.getElementById('defaultAlertGroup').value = data.default_alert_group || '';
+                });
+        }
+        
+        function saveSettings() {
+            const aiEnabled = document.getElementById('aiEnabled').checked;
+            const apiKey = document.getElementById('apiKey').value;
+            const defaultAlertGroup = document.getElementById('defaultAlertGroup').value;
+            
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ai_enabled: aiEnabled, openrouter_api_key: apiKey, default_alert_group: defaultAlertGroup })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('settingsMessage', 'تم حفظ الإعدادات بنجاح', 'success');
+                } else {
+                    showMessage('settingsMessage', 'حدث خطأ', 'error');
+                }
+            });
+        }
+        
+        function refreshLogs() {
+            fetch('/api/logs?lines=100')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('logsContainer').textContent = data.logs;
+                    // Auto-scroll to bottom
+                    const container = document.getElementById('logsContainer');
+                    container.scrollTop = container.scrollHeight;
+                });
+        }
+        
+        function showMessage(elementId, message, type) {
+            const msg = document.getElementById(elementId);
+            msg.textContent = message;
+            msg.className = type === 'error' ? 'error-message' : 'success-message';
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 5000);
+        }
+    </script>
+</body>
+</html>
